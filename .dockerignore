@@ -2,3 +2,8 @@
 .gitignore
 README.md
 .DS_Store
+*.md
+node_modules
+.env
+.vscode
+.idea

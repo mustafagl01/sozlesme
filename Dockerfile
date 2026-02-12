@@ -1,16 +1,26 @@
-# Nginx tabanlı hafif bir web sunucusu kullan
+# Use nginx alpine for smaller image size
 FROM nginx:alpine
 
-# HTML dosyalarını nginx'in varsayılan dizinine kopyala
-COPY mgl-sozlesme-platformu.html /usr/share/nginx/html/
-COPY logo.png /usr/share/nginx/html/
-COPY index.html /usr/share/nginx/html/
+# Remove default nginx config
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Özel nginx konfigürasyonunu kopyala
+# Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Nginx'in 80 portunu aç
+# Copy website files
+COPY index.html /usr/share/nginx/html/
+COPY mgl-sozlesme-platformu.html /usr/share/nginx/html/
+COPY logo.png /usr/share/nginx/html/
+
+# Set proper permissions
+RUN chmod -R 755 /usr/share/nginx/html
+
+# Expose port 80
 EXPOSE 80
 
-# Nginx'i başlat
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
+
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
