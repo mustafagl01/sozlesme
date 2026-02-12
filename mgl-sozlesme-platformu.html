@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MGL Automation - Dijital Sözleşme Platformu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        #signature-pad {
+            touch-action: none;
+        }
+
+        .signature-container {
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.75rem;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .signature-container:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #172554 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><g fill="%23ffffff" fill-opacity="0.05"><path d="M0 0h20L0 20z"/></g></svg>');
+            opacity: 0.3;
+        }
+
+        .contract-text {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+
+        .contract-text::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .contract-text::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .contract-text::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .price-card {
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col justify-center py-10">
+
+    <!-- ==================== ADMIN PANELİ ==================== -->
+    <div id="adminPanel" class="max-w-xl mx-auto hidden w-full px-4">
+        <div class="glass-panel rounded-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="gradient-header px-6 py-8 text-white text-center">
+                <div class="flex flex-col items-center justify-center gap-3 mb-3">
+                    <img src="logo.png" class="h-16 w-auto bg-white/10 rounded-xl p-2 backdrop-blur-sm shadow-lg"
+                        onerror="this.style.display='none'" alt="MGL Logo">
+                    <h2 class="text-2xl font-bold tracking-tight">Sözleşme Yöneticisi</h2>
+                </div>
+                <p class="text-blue-200 text-sm">MGL Automation Systems</p>
+            </div>
+
+            <div class="p-8 space-y-6">
+                <!-- Müşteri Adı -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 ml-1" data-lang="admin_client">Müşteri Adı /
+                        Firma</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-building text-gray-400"></i>
+                        </div>
+                        <input type="text" id="adminClient"
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50/50"
+                            placeholder="Örn: ABC Lojistik A.Ş.">
+                    </div>
+                </div>
+
+                <!-- Toplam Tutar -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 ml-1" data-lang="admin_total">Toplam Proje
+                        Bedeli</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-coins text-gray-400"></i>
+                        </div>
+                        <input type="number" id="adminTotal"
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50/50"
+                            placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Para Birimi -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700 ml-1" data-lang="admin_currency">Para
+                            Birimi</label>
+                        <select id="adminCurrency"
+                            class="block w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50">
+                            <option value="GBP">GBP (£)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="TRY">TRY (₺)</option>
+                        </select>
+                    </div>
+
+                    <!-- Dil -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700 ml-1"
+                            data-lang="admin_language">Sözleşme Dili</label>
+                        <select id="adminLanguage"
+                            class="block w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50/50">
+                            <option value="TR">Türkçe</option>
+                            <option value="EN">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Oluştur Butonu -->
+                <button id="generateLinkBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mt-4">
+                    <i class="fas fa-link"></i>
+                    <span data-lang="admin_generate">Sözleşme Linki Oluştur</span>
+                </button>
+
+                <!-- Sonuç Alanı -->
+                <div id="resultArea" class="hidden mt-6 animate-fade-in-up">
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        <div class="flex-1 overflow-hidden">
+                            <p class="text-sm font-medium text-green-800" data-lang="admin_copied">Link Kopyalandı!
+                                Müşteriye gönderebilirsiniz:</p>
+                            <p class="text-xs text-green-600 truncate mt-1 select-all font-mono" id="generatedLink">...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FooterInfo -->
+            <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 text-center">
+                <p class="text-xs text-gray-400">Secure Contract Generation v2.1</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MÜŞTERİ ARAYÜZÜ ==================== -->
+    <div id="clientPanel" class="max-w-3xl mx-auto hidden w-full px-4 pt-4 pb-12">
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-2xl">
+
+            <!-- Üst Bar - Dil Değiştirici -->
+            <div
+                class="bg-white/80 backdrop-blur border-b border-gray-100 px-6 py-3 flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-2">
+                    <div class="text-xs font-bold px-2 py-1 bg-blue-100 text-blue-700 rounded uppercase"
+                        data-lang="client_ref">REF NO:</div>
+                    <span class="text-xs font-mono text-gray-500">MGL-2026-X8</span>
+                </div>
+                <button id="langToggleBtn"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                    <i class="fas fa-globe"></i> <span id="currentLangText">EN</span>
+                </button>
+            </div>
+
+            <!-- Header -->
+            <div class="gradient-header px-8 py-10 text-white relative">
+                <div class="absolute top-0 right-0 p-6 opacity-10">
+                    <i class="fas fa-file-contract text-9xl transform rotate-12"></i>
+                </div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+                    <div
+                        class="flex-shrink-0 bg-white/10 p-3 rounded-2xl backdrop-blur-md shadow-xl border border-white/10">
+                        <img src="logo.png" id="contractLogo" class="h-20 w-auto object-contain"
+                            onerror="this.style.opacity='0.5'" alt="Logo">
+                    </div>
+                    <div class="text-center md:text-left pt-1">
+                        <h1 class="text-3xl md:text-4xl font-bold tracking-tight mb-2 text-white"
+                            data-lang="client_title">Hizmet Sözleşmesi</h1>
+                        <p class="text-blue-100 text-lg font-light">MGL Automation AI Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 space-y-10">
+                <!-- Karşılama -->
+                <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-6">
+                    <p class="text-lg text-gray-700">
+                        <span data-lang="client_hello" class="text-gray-500">Sayın</span>
+                        <strong class="text-blue-900 font-bold block text-2xl mt-1" id="displayClientName">...</strong>
+                    </p>
+                    <p class="text-gray-600 mt-2" data-lang="client_desc">Aşağıda detayları verilen Otomasyon Sistemi
+                        için sözleşmeniz hazırlanmıştır.</p>
+                </div>
+
+                <!-- Fiyat Kartları -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Toplam -->
+                    <div
+                        class="price-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden group">
+                        <div
+                            class="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500">
+                        </div>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1"
+                            data-lang="price_total">TOPLAM SİSTEM</div>
+                        <div class="text-2xl font-bold text-blue-900" id="displayTotal">0</div>
+                    </div>
+                    <!-- Kurulum -->
+                    <div
+                        class="price-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
+                        <div class="absolute w-1 h-full left-0 top-0 bg-orange-400"></div>
+                        <div class="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1"
+                            data-lang="price_setup">KURULUM (1.AY)</div>
+                        <div class="text-xl font-bold text-gray-800" id="displaySetup">0</div>
+                    </div>
+                    <!-- Aylık -->
+                    <div
+                        class="price-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
+                        <div class="absolute w-1 h-full left-0 top-0 bg-green-400"></div>
+                        <div class="text-xs font-bold text-green-600 uppercase tracking-wider mb-1"
+                            data-lang="price_monthly">AYLIK KİRA</div>
+                        <div class="text-xl font-bold text-gray-800" id="displayMonthly">0</div>
+                    </div>
+                    <!-- Balon -->
+                    <div
+                        class="price-card bg-white p-5 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
+                        <div class="absolute w-1 h-full left-0 top-0 bg-purple-400"></div>
+                        <div class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1"
+                            data-lang="price_balloon">DEVİR (6.AY)</div>
+                        <div class="text-xl font-bold text-gray-800" id="displayBalloon">0</div>
+                    </div>
+                </div>
+
+                <!-- Sözleşme Metni (Scrollable) -->
+                <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i> <span data-lang="client_contract">SÖZLEŞME İÇERİĞİ</span>
+                    </h3>
+                    <div class="border border-gray-200 rounded-2xl p-6 bg-gray-50/50 h-80 overflow-y-auto contract-text text-sm leading-relaxed space-y-4 shadow-inner"
+                        id="contractContent">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- İmza ve Tarih -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Tarih -->
+                    <div class="bg-gray-50 rounded-2xl p-5 border border-gray-200">
+                        <label class="block text-sm font-semibold text-gray-600 mb-2" data-lang="client_date">Sözleşme
+                            Tarihi</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="far fa-calendar-alt text-gray-400"></i>
+                            </div>
+                            <input type="text" id="contractDate" readonly
+                                class="w-full pl-10 pr-3 py-2 bg-white border border-gray-300 rounded-xl text-gray-700 font-medium">
+                        </div>
+                    </div>
+
+                    <!-- İmza -->
+                    <div class="bg-gray-50 rounded-2xl p-5 border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-semibold text-gray-600" data-lang="client_sign_title">İmzanızı
+                                Atınız</label>
+                            <button id="clearSignatureBtn"
+                                class="text-xs text-red-500 hover:text-red-700 font-medium underline">
+                                <span data-lang="client_clear">Temizle</span>
+                            </button>
+                        </div>
+                        <div class="signature-container relative h-48 w-full">
+                            <canvas id="signature-pad" class="absolute inset-0 w-full h-full cursor-crosshair"></canvas>
+                            <div class="absolute bottom-2 right-2 text-[10px] text-gray-400 pointer-events-none">Secure
+                                Digital Sign</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Onay Butonu -->
+                <button id="confirmBtn"
+                    class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-5 rounded-2xl shadow-xl shadow-blue-500/20 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group">
+                    <span class="bg-white/20 rounded-full p-1 group-hover:rotate-12 transition-transform duration-300">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </span>
+                    <span class="text-lg" data-lang="client_confirm">Sözleşmeyi Onayla ve İndir</span>
+                </button>
+            </div>
+            <!-- Copyright -->
+            <div
+                class="bg-gray-50 px-6 py-4 border-t border-gray-100 text-center flex justify-center items-center gap-2">
+                <i class="fas fa-shield-alt text-gray-300"></i>
+                <p class="text-xs text-gray-400">© 2026 MGL Automation Systems</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/4.1.5/signature_pad.umd.min.js"></script>
+
+    <script>
+        // Dil Verileri (Güncellenmiş)
+        const translations = {
+            TR: {
+                admin_client: "Müşteri Adı / Firma",
+                admin_total: "Toplam Proje Bedeli",
+                admin_currency: "Para Birimi",
+                admin_language: "Dil",
+                admin_generate: "Sözleşme Linki Oluştur",
+                admin_copied: "Link Panoya Kopyalandı! Müşteriye iletebilirsiniz.",
+
+                client_ref: "REF NO:",
+                client_title: "Hizmet ve Donanım Kiralama Sözleşmesi",
+                client_hello: "Sayın",
+                client_desc: "Aşağıda detayları verilen otomasyon projesi için hazırlanan sözleşme taslağıdır.",
+                price_total: "TOPLAM SİSTEM DEĞERİ",
+                price_setup: "KURULUM (1. Ay)",
+                price_monthly: "AYLIK KİRA (2-6. Ay)",
+                price_balloon: "DEVİR (6. Ay Sonu)",
+                client_date: "Sözleşme Tarihi",
+                client_contract: "SÖZLEŞME METNİ",
+                client_sign_title: "Lütfen Kutucuk İçine İmzanızı Atınız",
+                client_clear: "Temizle",
+                client_confirm: "Sözleşmeyi Onayla ve İndir",
+                client_confirm_sending: "Gönderiliyor...",
+                client_confirm_success: "Sözleşme İmzalandı ve Gönderildi",
+                client_footer: "Bu sözleşme dijital imza ile geçerlilik kazanmıştır. MGL Automation © 2026",
+
+                article1_title: "1. HİZMET TANIMI",
+                article1_text: "Sağlayıcı (MGL Otomasyon), Müşteriye 'Yapay Zeka Destekli Dijital Dönüşüm ve Otomasyon Altyapısı' sağlamayı taahhüt eder. Hizmet kapsamı, projenin niteliğine göre; Sesli Asistan (Voice AI), Metin Tabanlı Botlar (Chatbot/WhatsApp) ve Veri Entegrasyonu süreçlerini kapsar. Sistem, anahtar teslim çözüm olarak sunulur.",
+
+                pdf_pay_title: "2. ÖDEME VE TESLİMAT TAKVİMİ",
+                pdf_pay_1_label: "1. Ay (Başlangıç)",
+                pdf_pay_1_desc: "(Donanım kurulumu, lisans aktivasyonu ve ilk ay kullanım bedeli. İade edilmez.)",
+                pdf_pay_2_label: "2 - 6. Aylar",
+                pdf_pay_2_desc: "(Her ay ödenecek sistem kullanım ve yazılım kiralama bedeli.)",
+                pdf_pay_3_label: "6. Ay Sonu (Final)",
+                pdf_pay_3_desc: "(Mülkiyet devri ve donanım satın alma bedeli. Bu ödeme ile sistemin tam sahipliği Müşteriye geçer.)",
+
+                article3_title: "3. DONANIM MÜLKİYETİ",
+                article3_text: "Sistem donanımları, toplam proje bedeli tamamen ödenene kadar MGL Otomasyon mülkiyetindedir.",
+                article4_title: "4. ALTYAPI GİDERLERİ",
+                article4_text: "Aylık ücret sunucu ve API bakımını kapsar. 3. taraf iletişim giderleri (Telefon/SMS gibi) müşteriye aittir.",
+
+                error_empty_name: "Lütfen Müşteri Adı giriniz!",
+                error_empty_total: "Lütfen Toplam Tutar giriniz!",
+                error_empty_signature: "Lütfen imza alanını doldurunuz!",
+                success_created: "Sözleşme başarıyla oluşturuldu ve indirildi!"
+            },
+            EN: {
+                admin_client: "Client Name / Company",
+                admin_total: "Total Project Value",
+                admin_currency: "Currency",
+                admin_language: "Language",
+                admin_generate: "Generate and Copy Link",
+                admin_copied: "Link Copied! Ready to send.",
+
+                client_ref: "REF NO:",
+                client_title: "Service and Hardware Rental Agreement",
+                client_hello: "Dear",
+                client_desc: "The contract has been prepared for the Automation System detailed below.",
+                price_total: "TOTAL SYSTEM VALUE",
+                price_setup: "SETUP (Month 1)",
+                price_monthly: "RENTAL (Months 2-6)",
+                price_balloon: "TRANSFER (End of Month 6)",
+                client_date: "Contract Date",
+                client_contract: "CONTRACT TEXT",
+                client_sign_title: "Please Sign Inside the Box",
+                client_clear: "Clear Signature",
+                client_confirm: "Confirm and Download Contract",
+                client_confirm_sending: "Sending...",
+                client_confirm_success: "Contract Signed and Sent",
+                client_footer: "This contract is valid with electronic signature. MGL Automation © 2026",
+
+                article1_title: "1. SERVICE DEFINITION",
+                article1_text: "The Provider (MGL Automation) agrees to supply a custom-tailored 'AI-Powered Digital Transformation and Automation Infrastructure'. Depending on the specific project scope, the service may include Voice AI Assistants, Text-Based Bots (WhatsApp/Chat), Data Integration, and similar workflow automations. The system is delivered as a turnkey solution.",
+
+                pdf_pay_title: "2. PAYMENT AND DELIVERY SCHEDULE",
+                pdf_pay_1_label: "Month 1 (Initial)",
+                pdf_pay_1_desc: "(Includes hardware setup, license activation, and 1st month of usage. Non-refundable.)",
+                pdf_pay_2_label: "Months 2 - 6",
+                pdf_pay_2_desc: "(Monthly system usage and software rental fee.)",
+                pdf_pay_3_label: "End of Month 6 (Final)",
+                pdf_pay_3_desc: "(Ownership transfer and hardware purchase fee. Full ownership is transferred upon this payment.)",
+
+                article3_title: "3. HARDWARE OWNERSHIP",
+                article3_text: "System Hardware remains the property of MGL Automation until the total project value is fully paid.",
+                article4_title: "4. INFRASTRUCTURE COSTS",
+                article4_text: "The monthly fee covers server and API maintenance. Third-party communication costs (Phone/SMS) are borne by the client.",
+
+                error_empty_name: "Please enter Client Name!",
+                error_empty_total: "Please enter Total Project Value!",
+                error_empty_signature: "Please sign the signature field!",
+                success_created: "Contract created and downloaded successfully!"
+            }
+        };
+
+        let signaturePad;
+        let currentLang = 'TR';
+        let contractData = {
+            client: '',
+            total: 0,
+            currency: 'GBP',
+            lang: 'TR'
+        };
+
+        const currencySymbols = {
+            GBP: '£',
+            USD: '$',
+            EUR: '€',
+            TRY: '₺'
+        };
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function () {
+            initApp();
+        });
+
+        function initApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasParams = urlParams.has('client') && urlParams.has('total');
+
+            if (hasParams) {
+                contractData = {
+                    client: urlParams.get('client'),
+                    total: parseInt(urlParams.get('total')),
+                    currency: urlParams.get('cur') || 'GBP',
+                    lang: urlParams.get('lang') || 'TR'
+                };
+                currentLang = contractData.lang;
+                showClientPanel();
+            } else {
+                showAdminPanel();
+            }
+        }
+
+        // ==================== ADMIN PANEL ====================
+        function showAdminPanel() {
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('clientPanel').classList.add('hidden');
+            document.getElementById('generateLinkBtn').addEventListener('click', generateContractLink);
+        }
+
+        function generateContractLink() {
+            const client = document.getElementById('adminClient').value.trim();
+            const total = document.getElementById('adminTotal').value.trim();
+            const currency = document.getElementById('adminCurrency').value;
+            const lang = document.getElementById('adminLanguage').value;
+
+            if (!client) { showNotification('error_empty_name', 'error'); return; }
+            if (!total || parseInt(total) <= 0) { showNotification('error_empty_total', 'error'); return; }
+
+            const baseUrl = window.location.href.split('?')[0];
+            const params = new URLSearchParams({ client, total, cur: currency, lang });
+            const fullUrl = `${baseUrl}?${params.toString()}`;
+
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                document.getElementById('resultArea').classList.remove('hidden');
+                document.getElementById('generatedLink').textContent = fullUrl;
+                showNotification('admin_copied', 'success');
+            }).catch(() => {
+                document.getElementById('resultArea').classList.remove('hidden');
+                document.getElementById('generatedLink').textContent = fullUrl;
+                showNotification('admin_copied', 'success');
+            });
+        }
+
+        // ==================== CLIENT PANEL ====================
+        function showClientPanel() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('clientPanel').classList.remove('hidden');
+
+            document.getElementById('langToggleBtn').addEventListener('click', toggleLanguage);
+            document.getElementById('clearSignatureBtn').addEventListener('click', () => signaturePad.clear());
+            document.getElementById('confirmBtn').addEventListener('click', confirmAndDownload);
+
+            setTodayDate();
+            initSignaturePad();
+            updateClientPanel();
+        }
+
+        function updateClientPanel() {
+            document.getElementById('displayClientName').textContent = contractData.client;
+
+            const total = contractData.total;
+            const setupFee = Math.round(total * 0.25);
+            const monthlyFee = Math.round((total * 0.416) / 5);
+            const balloonFee = total - setupFee - (monthlyFee * 5); // Correct formula
+
+            const symbol = currencySymbols[contractData.currency] || contractData.currency;
+
+            document.getElementById('displayTotal').textContent = `${symbol}${total.toLocaleString()}`;
+            document.getElementById('displaySetup').textContent = `${symbol}${setupFee.toLocaleString()}`;
+            document.getElementById('displayMonthly').textContent = `${symbol}${monthlyFee.toLocaleString()}`;
+            document.getElementById('displayBalloon').textContent = `${symbol}${balloonFee.toLocaleString()}`;
+
+            updateContractContent(setupFee, monthlyFee, balloonFee);
+            updateLanguageTexts();
+        }
+
+        function updateContractContent(setupFee, monthlyFee, balloonFee) {
+            const t = translations[currentLang];
+            const symbol = currencySymbols[contractData.currency] || contractData.currency;
+
+            const html = `
+                <div class="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-600 shadow-sm">
+                    <strong class="text-blue-900 block mb-1 text-base">${t.article1_title}</strong>
+                    <p class="text-gray-700 leading-relaxed">${t.article1_text}</p>
+                </div>
+
+                <div class="bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-600 shadow-sm mt-4">
+                    <strong class="text-indigo-900 block mb-2 text-base">${t.pdf_pay_title}</strong>
+                    <div class="flex justify-between items-center border-b border-indigo-200 pb-2 mb-2">
+                        <span class="text-gray-600 font-medium">${t.price_total}</span>
+                        <span class="text-indigo-700 font-bold text-lg">${symbol}${contractData.total.toLocaleString()}</span>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-2 rounded-lg border border-indigo-100">
+                            <div><strong class="text-gray-800">${t.price_setup}</strong> <span class="text-xs text-gray-500 block sm:inline ml-1">${t.pdf_pay_1_desc}</span></div>
+                            <span class="font-bold text-indigo-700 mt-1 sm:mt-0">${symbol}${setupFee.toLocaleString()}</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-2 rounded-lg border border-indigo-100">
+                            <div><strong class="text-gray-800">${t.price_monthly}</strong> <span class="text-xs text-gray-500 block sm:inline ml-1">${t.pdf_pay_2_desc}</span></div>
+                            <span class="font-bold text-indigo-700 mt-1 sm:mt-0">${symbol}${monthlyFee.toLocaleString()}</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-2 rounded-lg border border-indigo-100">
+                            <div><strong class="text-gray-800">${t.price_balloon}</strong> <span class="text-xs text-gray-500 block sm:inline ml-1">${t.pdf_pay_3_desc}</span></div>
+                            <span class="font-bold text-indigo-700 mt-1 sm:mt-0">${symbol}${balloonFee.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 p-4 rounded-xl border-l-4 border-amber-600 shadow-sm mt-4">
+                    <strong class="text-amber-900 block mb-1 text-base">${t.article3_title}</strong>
+                    <p class="text-gray-700 leading-relaxed">${t.article3_text}</p>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-xl border-l-4 border-gray-600 shadow-sm mt-4">
+                    <strong class="text-gray-900 block mb-1 text-base">${t.article4_title}</strong>
+                    <p class="text-gray-700 leading-relaxed">${t.article4_text}</p>
+                </div>
+            `;
+            document.getElementById('contractContent').innerHTML = html;
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'TR' ? 'EN' : 'TR';
+            contractData.lang = currentLang;
+            document.getElementById('currentLangText').textContent = currentLang === 'TR' ? 'EN' : 'TR';
+            const total = contractData.total;
+            updateContractContent(Math.round(total * 0.25), Math.round((total * 0.416) / 5), total - Math.round(total * 0.25) - (Math.round((total * 0.416) / 5) * 5));
+            updateLanguageTexts();
+        }
+
+        function updateLanguageTexts() {
+            const t = translations[currentLang];
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (t[key]) {
+                    if (el.tagName === 'INPUT') el.placeholder = t[key];
+                    else el.textContent = t[key];
+                }
+            });
+        }
+
+        function initSignaturePad() {
+            const canvas = document.getElementById('signature-pad');
+            const container = canvas.parentElement;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = container.offsetWidth * ratio;
+            canvas.height = 200 * ratio; // Set height explicitly
+            canvas.style.width = container.offsetWidth + 'px';
+            canvas.style.height = '200px';
+            canvas.getContext('2d').scale(ratio, ratio);
+
+            signaturePad = new SignaturePad(canvas, { penColor: '#1e3a8a', minWidth: 1, maxWidth: 2.5 });
+
+            // Resize handler
+            window.addEventListener('resize', debounce(function () {
+                const data = signaturePad.toDataURL();
+                canvas.width = container.offsetWidth * ratio;
+                canvas.height = 200 * ratio;
+                canvas.style.width = container.offsetWidth + 'px';
+                canvas.style.height = '200px';
+                canvas.getContext('2d').scale(ratio, ratio);
+                signaturePad.fromDataURL(data);
+            }, 200));
+        }
+
+        // ==================== MAIN ACTION: SIGN & SEND & PDF ====================
+        async function confirmAndDownload() {
+            const t = translations[currentLang];
+            const btn = document.getElementById('confirmBtn');
+            const originalText = btn.innerHTML;
+
+            // 1. Validation
+            if (signaturePad.isEmpty()) { showNotification('error_empty_signature', 'error'); return; }
+
+            // 2. Button State: Loading
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.client_confirm_sending}`;
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                // 3. Prepare Data
+                const total = contractData.total;
+                const setup = Math.round(total * 0.25);
+                const monthly = Math.round((total * 0.416) / 5);
+                const balloon = total - setup - (monthly * 5);
+
+                const payload = {
+                    client: contractData.client,
+                    date: document.getElementById('contractDate').value,
+                    total: total,
+                    setup: setup,
+                    monthly: monthly,
+                    balloon: balloon,
+                    signature: signaturePad.toDataURL(), // Base64 signature
+                    currency: contractData.currency
+                };
+
+                // 4. Send Webhook
+                const webhookUrl = "https://nt3ys1ml.rpcd.host/webhook/928aa7dc-5175-44a1-a054-95e935e97393";
+
+                // Hata yakalama için basit bir fetch wrapper
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Webhook sonucundan bağımsız PDF üret ama hata varsa logla
+                if (!response.ok) console.warn("Webhook failed:", response.status);
+
+                // 5. Generate PDF (Await it to ensure it finishes before success msg)
+                await generatePDF();
+
+                // 6. Success State
+                showNotification('client_confirm_success', 'success');
+                btn.innerHTML = `<i class="fas fa-check-double"></i> ${t.client_confirm_success}`;
+                btn.classList.replace('from-blue-600', 'from-green-600');
+                btn.classList.replace('to-indigo-700', 'to-green-700');
+
+            } catch (error) {
+                console.error("Process Error:", error);
+                // Webhook hatası olsa bile PDF'i verelim ki kullanıcı mağdur olmasın
+                await generatePDF();
+                showNotification('client_confirm_success', 'success'); // Yine de başarılı sayıyoruz kullanıcı sözleşmeyi aldı
+            } finally {
+                // Reset button after 5 seconds to allow re-download if needed
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('from-green-600', 'from-blue-600');
+                    btn.classList.replace('to-green-700', 'to-indigo-700');
+                }, 5000);
+            }
+        }
+
+        // ==================== PREMIUM PDF GENERATION ====================
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const t = translations[currentLang];
+            const symbol = currencySymbols[contractData.currency] || contractData.currency;
+
+            // --- Helper: Clean Text for Turkish chars ---
+            function cleanText(text) {
+                if (!text) return "";
+                return text
+                    .replace(/ğ/g, "g").replace(/Ğ/g, "G").replace(/ü/g, "u").replace(/Ü/g, "U")
+                    .replace(/ş/g, "s").replace(/Ş/g, "S").replace(/ı/g, "i").replace(/I/g, "I")
+                    .replace(/İ/g, "I").replace(/ö/g, "o").replace(/Ö/g, "O").replace(/ç/g, "c").replace(/Ç/g, "C");
+            }
+
+            // --- Helper: Load Logo Safely ---
+            const getLogo = () => {
+                return new Promise(resolve => {
+                    // Method 1: Try getting from existing DOM element (Best for local files if loaded)
+                    const imgEl = document.getElementById('contractLogo');
+                    if (imgEl && imgEl.complete && imgEl.naturalHeight !== 0) {
+                        try {
+                            const cvs = document.createElement('canvas');
+                            cvs.width = imgEl.naturalWidth;
+                            cvs.height = imgEl.naturalHeight;
+                            cvs.getContext('2d').drawImage(imgEl, 0, 0);
+                            resolve(cvs.toDataURL('image/png'));
+                            return;
+                        } catch (e) { console.warn("DOM Logo fail, trying reload"); }
+                    }
+
+                    // Method 2: Create new Image object (Fallback)
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.src = "logo.png?v=" + new Date().getTime(); // Cache bust
+                    img.onload = function () {
+                        const cvs = document.createElement('canvas');
+                        cvs.width = img.width;
+                        cvs.height = img.height;
+                        cvs.getContext('2d').drawImage(img, 0, 0);
+                        resolve(cvs.toDataURL('image/png'));
+                    };
+                    img.onerror = () => {
+                        console.warn("Logo failed to load completely.");
+                        resolve(null);
+                    };
+                });
+            };
+
+            const logoData = await getLogo();
+
+            // --- DESIGN: Header Strip ---
+            doc.setFillColor(30, 58, 138); // #1e3a8a (Koyu Lacivert)
+            doc.rect(0, 0, pageWidth, 40, 'F');
+
+            // --- HEADER INFO ---
+            // Logo Placement: Top Left inside strip
+            if (logoData) {
+                // Max height 28mm, keep aspect ratio
+                const aspectRatio = 3; // Approx
+                doc.addImage(logoData, 'PNG', 15, 6, 0, 28); // Width 0 = auto calc based on height
+            } else {
+                // Fallback text if logo fails
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("MGL", 15, 25);
+            }
+
+            // Title: Centered, White
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("MGL AUTOMATION", pageWidth / 2, 20, { align: "center" });
+
+            // Subtitle: Centered, White/Blueish
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(219, 234, 254); // blue-100
+            const pdfSub = currentLang === 'TR' ? "Hizmet ve Donanim Kiralama Sozlesmesi" : "Service & Hardware Rental Agreement";
+            doc.text(cleanText(pdfSub), pageWidth / 2, 30, { align: "center" });
+
+
+            // --- INFO SECTION ---
+            let yPos = 55;
+            const margin = 20;
+            const today = formatDate(document.getElementById('contractDate').value);
+
+            // Client Info Box
+            doc.setDrawColor(200, 200, 200);
+            doc.setFillColor(250, 250, 250);
+            doc.roundedRect(margin, yPos - 5, pageWidth - (margin * 2), 25, 2, 2, 'FD');
+
+            doc.setTextColor(50, 50, 50);
+            doc.setFontSize(10);
+
+            // Left: Client Name
+            doc.setFont("helvetica", "bold");
+            doc.text(cleanText(t.admin_client).toUpperCase(), margin + 5, yPos + 3);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.setTextColor(30, 58, 138); // Navy
+            doc.text(cleanText(contractData.client), margin + 5, yPos + 10);
+
+            // Right: Date
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.setFont("helvetica", "bold");
+            doc.text(cleanText(t.client_date).toUpperCase(), pageWidth - margin - 50, yPos + 3);
+            doc.setFont("helvetica", "normal");
+            doc.text(cleanText(today), pageWidth - margin - 50, yPos + 9);
+
+            yPos += 30;
+
+            // --- ARTICLES ---
+            function checkY(needed) {
+                if (yPos + needed > pageHeight - 30) {
+                    doc.addPage();
+                    // New Page Header (Smaller)
+                    doc.setFillColor(30, 58, 138);
+                    doc.rect(0, 0, pageWidth, 15, 'F');
+                    // Footer
+                    drawFooter();
+                    yPos = 30;
+                }
+            }
+
+            function drawFooter() {
+                // Footer Strip
+                doc.setFillColor(30, 58, 138);
+                doc.rect(0, pageHeight - 12, pageWidth, 12, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(9);
+                doc.text("© 2026 MGL Automation Systems", pageWidth / 2, pageHeight - 5, { align: "center" });
+            }
+
+            // Article 1
+            checkY(40);
+            drawArticleHeader("01. " + cleanText(t.article1_title));
+            drawArticleBody(cleanText(t.article1_text));
+
+            // Payment Table
+            checkY(80);
+            drawArticleHeader("02. " + cleanText(t.pdf_pay_title));
+
+            // Table Logic
+            const setupFee = Math.round(contractData.total * 0.25);
+            const monthlyFee = Math.round((contractData.total * 0.416) / 5);
+            const balloonFee = contractData.total - setupFee - (monthlyFee * 5);
+
+            const rows = [
+                { l: "1. Ay (Kurulum/Lisans)", p: `${symbol}${setupFee.toLocaleString()}`, d: t.pdf_pay_1_desc },
+                { l: "2 - 6. Aylar (Kiralama)", p: `${symbol}${monthlyFee.toLocaleString()}`, d: t.pdf_pay_2_desc },
+                { l: "6. Ay Sonu (Mulkiyet Devri)", p: `${symbol}${balloonFee.toLocaleString()}`, d: t.pdf_pay_3_desc }
+            ];
+
+            const tableW = pageWidth - (margin * 2);
+            let rowY = yPos;
+
+            // Table Header Line
+            doc.setDrawColor(30, 58, 138);
+            doc.setLineWidth(0.5);
+            doc.line(margin, rowY, margin + tableW, rowY);
+            rowY += 2;
+
+            rows.forEach((r, i) => {
+                // Stripe
+                if (i % 2 === 0) {
+                    doc.setFillColor(245, 247, 250);
+                    doc.rect(margin, rowY, tableW, 14, 'F');
+                }
+
+                // Bold Label (Ay)
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(30, 58, 138);
+                doc.text(cleanText(r.l), margin + 2, rowY + 5);
+
+                // Price (Green)
+                doc.setTextColor(22, 163, 74);
+                doc.text(r.p, margin + 60, rowY + 5);
+
+                // Desc (Gray)
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(80, 80, 80);
+                doc.setFontSize(9);
+                const descLines = doc.splitTextToSize(cleanText(r.d), tableW - 85);
+                doc.text(descLines, margin + 85, rowY + 5);
+
+                rowY += 14;
+            });
+
+            // Total Box
+            rowY += 2;
+            doc.setFillColor(30, 58, 138);
+            doc.roundedRect(margin + tableW - 70, rowY, 70, 10, 1, 1, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text(`${cleanText(t.price_total)}: ${symbol}${contractData.total.toLocaleString()}`, margin + tableW - 65, rowY + 6.5);
+
+            yPos = rowY + 20;
+
+            // Article 3 & 4
+            checkY(30);
+            drawArticleHeader("03. " + cleanText(t.article3_title));
+            drawArticleBody(cleanText(t.article3_text));
+
+            checkY(30);
+            drawArticleHeader("04. " + cleanText(t.article4_title));
+            drawArticleBody(cleanText(t.article4_text));
+
+            // Signature Section
+            checkY(50);
+            yPos += 5;
+            doc.setDrawColor(150, 150, 150);
+            doc.setLineDash([3, 3]);
+            doc.rect(margin, yPos, 80, 35); // Signature Box
+            doc.setLineDash([]);
+
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(cleanText(currentLang === 'TR' ? "Musteri Imzasi" : "Client Signature"), margin + 2, yPos - 2);
+
+            if (!signaturePad.isEmpty()) {
+                const sigImg = signaturePad.toDataURL('image/png');
+                doc.addImage(sigImg, 'PNG', margin + 5, yPos + 3, 70, 28);
+
+                // Stamp
+                const stampX = pageWidth - margin - 35;
+                const stampY = yPos + 5;
+                doc.setDrawColor(22, 163, 74); // Green
+                doc.setLineWidth(1);
+                doc.circle(stampX + 15, stampY + 15, 12, 'S');
+                doc.setTextColor(22, 163, 74);
+                doc.setFontSize(8);
+                doc.setFont("helvetica", "bold");
+                doc.text("APPROVED", stampX + 15, stampY + 15, { align: "center", angle: -15 });
+            }
+
+            // Draw Footer on First Page
+            drawFooter();
+
+            // Save
+            const fileName = `MGL_Sozlesme_${cleanText(contractData.client).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+            doc.save(fileName);
+
+            // Helpers
+            function drawArticleHeader(title) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.setTextColor(30, 58, 138);
+                doc.text(cleanText(title), margin, yPos);
+                yPos += 6;
+            }
+            function drawArticleBody(text) {
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.setTextColor(60, 60, 60);
+                const lines = doc.splitTextToSize(text, pageWidth - (margin * 2));
+                doc.text(lines, margin, yPos);
+                yPos += (lines.length * 5) + 8;
+            }
+        }
+
+        // --- Basic Utils ---
+        function setTodayDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('contractDate').value = today.toLocaleDateString(currentLang === 'TR' ? 'tr-TR' : 'en-GB', options);
+        }
+        function formatDate(d) { return d; } // Already formatted in input
+
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+
+        function showNotification(msgOrKey, type) {
+            const t = translations[currentLang];
+            const msg = t[msgOrKey] || msgOrKey;
+
+            const div = document.createElement('div');
+            div.className = `fixed top-5 right-5 z-50 px-6 py-4 rounded-xl shadow-2xl text-white font-medium transform transition-all duration-300 ${type === 'error' ? 'bg-red-500' : 'bg-green-600'}`;
+            div.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation' : 'fa-check'} mr-2"></i> ${msg}`;
+            document.body.appendChild(div);
+            setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 4000);
+        }
+    </script>
+</body>
+
+</html>
