@@ -382,7 +382,7 @@
                 pdf_pay_1_label: "1. Ay (Başlangıç)",
                 pdf_pay_1_desc: "(Donanım kurulumu, lisans aktivasyonu ve ilk ay kullanım bedeli. İade edilmez.)",
                 pdf_pay_2_label: "2 - 6. Aylar",
-                pdf_pay_2_desc: "(Her ay ödenecek sistem kullanım ve yazılım kiralama bedeli.)",
+                pdf_pay_2_desc: "(Her ay ödenecek sistem kullanım ve yazılım kiralama bedeli. Bu ödemeler satın alma bedelinden mahsup edilir.)",
                 pdf_pay_3_label: "6. Ay Sonu (Final)",
                 pdf_pay_3_desc: "(Mülkiyet devri ve donanım satın alma bedeli. Bu ödeme ile sistemin tam sahipliği Müşteriye geçer.)",
 
@@ -390,6 +390,10 @@
                 article3_text: "Sistem donanımları, toplam proje bedeli tamamen ödenene kadar MGL Otomasyon mülkiyetindedir.",
                 article4_title: "4. ALTYAPI GİDERLERİ",
                 article4_text: "Aylık ücret sunucu ve API bakımını kapsar. 3. taraf iletişim giderleri (Telefon/SMS gibi) müşteriye aittir.",
+                article5_title: "5. ERKEN SONLANDIRMA",
+                article5_text: "Müşteri 6 ay dolmadan sözleşmeyi sonlandırırsa: (a) Kurulum bedeli iade edilmez, (b) Ödenen aylık kira bedelleri hizmet karşılığı sayılır ve iade edilmez, (c) Sistem donanımları MGL Otomasyona iade edilir. Örnek: 3. ayda vazgeçilirse kurulum + 2 aylık kira ödenmiş olur, donanım geri alınır.",
+                article6_title: "6. ÖDEME KURALLARI",
+                article6_text: "2-6. aylarda ödenen kiralama bedelleri, 6. ay sonunda yapılacak satın alma bedelinden otomatik olarak mahsup edilir. Toplam ödeme tutarı (Kurulum + 5xAylık + Satın Alma) = Toplam Proje Bedeline eşittir. Gecikme durumunda 2 ay üst üste ödeme yapılmazsa sistem askıya alınır, 3. ayda feshedilir.",
 
                 error_empty_name: "Lütfen Müşteri Adı giriniz!",
                 error_empty_total: "Lütfen Toplam Tutar giriniz!",
@@ -428,7 +432,7 @@
                 pdf_pay_1_label: "Month 1 (Initial)",
                 pdf_pay_1_desc: "(Includes hardware setup, license activation, and 1st month of usage. Non-refundable.)",
                 pdf_pay_2_label: "Months 2 - 6",
-                pdf_pay_2_desc: "(Monthly system usage and software rental fee.)",
+                pdf_pay_2_desc: "(Monthly system usage and software rental fee. These payments are offset from the final purchase price.)",
                 pdf_pay_3_label: "End of Month 6 (Final)",
                 pdf_pay_3_desc: "(Ownership transfer and hardware purchase fee. Full ownership is transferred upon this payment.)",
 
@@ -436,6 +440,10 @@
                 article3_text: "System Hardware remains the property of MGL Automation until the total project value is fully paid.",
                 article4_title: "4. INFRASTRUCTURE COSTS",
                 article4_text: "The monthly fee covers server and API maintenance. Third-party communication costs (Phone/SMS) are borne by the client.",
+                article5_title: "5. EARLY TERMINATION",
+                article5_text: "If the Client terminates before 6 months: (a) Setup fee is non-refundable, (b) Paid monthly rentals are considered service fees and non-refundable, (c) Hardware must be returned to MGL Automation. Example: Termination at month 3 means Setup + 2 monthly fees are paid, hardware is returned.",
+                article6_title: "6. PAYMENT RULES",
+                article6_text: "Monthly rental fees (months 2-6) are automatically offset from the final purchase payment at month 6. Total payment (Setup + 5xMonthly + Purchase) equals the Total Project Value. If payment is missed for 2 consecutive months, the system is suspended. After 3 months of non-payment, the contract is terminated.",
 
                 error_empty_name: "Please enter Client Name!",
                 error_empty_total: "Please enter Total Project Value!",
@@ -587,6 +595,16 @@
                 <div class="bg-gray-100 p-4 rounded-xl border-l-4 border-gray-600 shadow-sm mt-4">
                     <strong class="text-gray-900 block mb-1 text-base">${t.article4_title}</strong>
                     <p class="text-gray-700 leading-relaxed">${t.article4_text}</p>
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-xl border-l-4 border-red-600 shadow-sm mt-4">
+                    <strong class="text-red-900 block mb-1 text-base">${t.article5_title}</strong>
+                    <p class="text-gray-700 leading-relaxed">${t.article5_text}</p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-600 shadow-sm mt-4">
+                    <strong class="text-blue-900 block mb-1 text-base">${t.article6_title}</strong>
+                    <p class="text-gray-700 leading-relaxed">${t.article6_text}</p>
                 </div>
             `;
             document.getElementById('contractContent').innerHTML = html;
@@ -913,7 +931,7 @@
 
             yPos = rowY + 20;
 
-            // Article 3 & 4
+            // Article 3 & 4 & 5 & 6
             checkY(30);
             drawArticleHeader("03. " + cleanText(t.article3_title));
             drawArticleBody(cleanText(t.article3_text));
@@ -921,6 +939,14 @@
             checkY(30);
             drawArticleHeader("04. " + cleanText(t.article4_title));
             drawArticleBody(cleanText(t.article4_text));
+
+            checkY(30);
+            drawArticleHeader("05. " + cleanText(t.article5_title));
+            drawArticleBody(cleanText(t.article5_text));
+
+            checkY(30);
+            drawArticleHeader("06. " + cleanText(t.article6_title));
+            drawArticleBody(cleanText(t.article6_text));
 
             // Signature Section
             checkY(50);
